@@ -1,0 +1,78 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asmodee | Inspired by Players</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,700;0,900;1,700;1,900&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              asmodee: {
+                red: '#e30613',
+                yellow: '#ffc20e',
+                cyan: '#00aeef',
+                black: '#000000',
+                white: '#ffffff',
+                gray: '#f2f2f2'
+              }
+            },
+            fontFamily: {
+              sans: ['Montserrat', 'sans-serif'],
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #000000;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .asmo-shadow {
+            box-shadow: 8px 8px 0px #000000;
+        }
+        .asmo-shadow-sm {
+            box-shadow: 4px 4px 0px #000000;
+        }
+        .asmo-border {
+            border: 3px solid #000000;
+        }
+        .wavy-divider {
+            mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg"><path d="M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,149.3C672,149,768,203,864,229.3C960,256,1056,256,1152,224C1248,192,1344,128,1392,96L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z" fill="black"/></svg>');
+            mask-repeat: no-repeat;
+            mask-size: cover;
+        }
+        .skew-title {
+            transform: skew(-5deg) rotate(-2deg);
+        }
+        @keyframes bounce-slow {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .animate-bounce-slow {
+            animation: bounce-slow 3s infinite ease-in-out;
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.38.0"
+  }
+}
+</script>
+</head>
+<body class="overflow-x-hidden selection:bg-asmodee-yellow selection:text-asmodee-black">
+    <div id="root"></div>
+</body>
+</html>

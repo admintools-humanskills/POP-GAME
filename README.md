@@ -1,20 +1,71 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# POP GAME - Le Moteur de Jeux
 
-# Run and deploy your AI Studio app
+Une expérience immersive et experte pour trouver le jeu de societe parfait selon votre personnalite ou votre evenement, propulsee par l'IA Gemini.
 
-This contains everything you need to run your app locally.
+## Stack
 
-View your app in AI Studio: https://ai.studio/apps/4f117c71-7188-4053-bfc6-3e44fe190992
+- **Frontend** : React 19 + TypeScript + Vite 6 + Tailwind CSS 4
+- **IA** : Google Gemini (via Cloud Function proxy)
+- **Font** : Montserrat
 
-## Run Locally
+## Architecture
 
-**Prerequisites:**  Node.js
+```
+Frontend (Vite) → VITE_GEMINI_PROXY_URL → Cloud Function (gemini-proxy) → Gemini API
+```
 
+- Le frontend appelle la Cloud Function via `VITE_GEMINI_PROXY_URL`
+- La Cloud Function detient la `GEMINI_API_KEY` cote serveur
+- Modeles IA (fallback) : `gemini-2.5-flash` → `gemini-2.5-flash-lite` → `gemini-2.0-flash-lite`
+- Retry : 2 tentatives par modele avec backoff sur erreurs 503
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Setup local
+
+### Prerequisites
+
+- Node.js
+
+### Installation
+
+```bash
+npm install
+```
+
+### Variables d'environnement
+
+Copier `.env.example` en `.env` et renseigner :
+
+```env
+VITE_GEMINI_PROXY_URL=<url de la cloud function gemini proxy>
+```
+
+### Lancer en local
+
+```bash
+npm run dev
+```
+
+L'app tourne sur `http://localhost:3000`
+
+## Cloud Function (Gemini Proxy)
+
+Source : `functions/gemini-proxy/`
+
+La Cloud Function recoit les requetes du frontend et appelle l'API Gemini avec la cle API stockee en variable d'environnement serveur (`GEMINI_API_KEY`).
+
+## Structure du projet
+
+```
+├── App.tsx                  # Composant principal
+├── index.tsx                # Point d'entree React
+├── index.css                # Styles Tailwind + theme Asmodee
+├── index.html               # HTML template
+├── geminiService.ts         # Service d'appel au proxy Gemini
+├── types.ts                 # Types TypeScript
+├── vite.config.ts           # Config Vite
+├── functions/
+│   └── gemini-proxy/
+│       ├── index.js         # Cloud Function proxy
+│       └── package.json
+└── package.json
+```

@@ -188,42 +188,51 @@ const App: React.FC = () => {
 
             {/* Input Section */}
             <section className="pb-24 px-6 max-w-3xl mx-auto w-full relative z-20">
-              <div className="bg-pop-white overflow-hidden">
+              <div className="overflow-hidden border-2 border-pop-white/20 relative">
+                {/* Glow background */}
+                <div className="absolute inset-0 bg-gradient-to-br from-pop-violet/5 via-pop-black to-pop-pink/5 pointer-events-none" />
+
                 {/* Mode Tabs */}
-                <div className="flex">
+                <div className="flex relative z-10">
                     <button
                         onClick={() => setMode('cadeau')}
-                        className={`flex-1 py-5 text-xs font-bold uppercase tracking-[0.2em] transition-all ${mode === 'cadeau' ? 'bg-pop-yellow text-pop-black' : 'bg-pop-black text-pop-white/50 hover:text-pop-yellow'}`}
+                        className={`flex-1 py-5 text-xs font-black uppercase tracking-[0.2em] transition-all duration-300 ${mode === 'cadeau' ? 'bg-pop-yellow text-pop-black' : 'bg-pop-black/80 text-pop-white/40 hover:text-pop-yellow hover:bg-pop-black'}`}
                     >
                         Mode Cadeau
                     </button>
                     <button
                         onClick={() => setMode('occasion')}
-                        className={`flex-1 py-5 text-xs font-bold uppercase tracking-[0.2em] transition-all ${mode === 'occasion' ? 'bg-pop-violet text-pop-white' : 'bg-pop-black text-pop-white/50 hover:text-pop-violet'}`}
+                        className={`flex-1 py-5 text-xs font-black uppercase tracking-[0.2em] transition-all duration-300 ${mode === 'occasion' ? 'bg-pop-violet text-pop-white' : 'bg-pop-black/80 text-pop-white/40 hover:text-pop-violet hover:bg-pop-black'}`}
                     >
                         Mode Occasion
                     </button>
                 </div>
 
-                <div className="p-8 md:p-10">
-                    <div className="flex flex-col gap-8 mb-8">
+                <div className="p-8 md:p-10 relative z-10">
+                    <div className="flex flex-col gap-6 mb-8">
                         {/* Age Input */}
                         <div>
-                          <label className="block text-[10px] font-bold uppercase tracking-[0.3em] mb-3 text-pop-pink">Pour quel âge ?</label>
+                          <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] mb-3 text-pop-pink">
+                            <span className="w-2 h-2 rounded-full bg-pop-pink inline-block" />
+                            Pour quel âge ?
+                          </label>
                           <input
                             type="text"
                             value={ageInput}
                             onChange={(e) => setAgeInput(e.target.value)}
                             placeholder="Ex: 28 ans, enfants de 5 et 6 ans..."
-                            className="w-full bg-pop-white border border-pop-black/15 p-5 text-pop-black font-medium placeholder-pop-black/30 focus:outline-none focus:border-pop-pink transition-colors"
+                            className="w-full bg-pop-white/5 border border-pop-white/15 rounded-lg p-5 text-pop-white font-medium placeholder-pop-white/25 focus:outline-none focus:border-pop-pink focus:bg-pop-white/10 focus:shadow-[0_0_20px_rgba(255,86,174,0.15)] transition-all"
                           />
                         </div>
 
                         {/* Description */}
                         <div>
-                            <label className="block text-[10px] font-bold uppercase tracking-[0.3em] mb-3 text-pop-violet">Dites-nous en plus sur l'envie</label>
+                            <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] mb-3 text-pop-violet">
+                              <span className="w-2 h-2 rounded-full bg-pop-violet inline-block" />
+                              Dites-nous en plus sur l'envie
+                            </label>
                             <textarea
-                                className="w-full bg-pop-white border border-pop-black/15 p-5 text-pop-black placeholder-pop-black/30 focus:outline-none focus:border-pop-violet transition-colors h-36 resize-none"
+                                className="w-full bg-pop-white/5 border border-pop-white/15 rounded-lg p-5 text-pop-white placeholder-pop-white/25 focus:outline-none focus:border-pop-violet focus:bg-pop-white/10 focus:shadow-[0_0_20px_rgba(85,68,204,0.15)] transition-all h-40 resize-none"
                                 placeholder={mode === 'cadeau' ? "Décrivez le profil : Fan de stratégie ? Créatif ? C'est un cadeau pour qui ?" : "On est combien ? On a combien de temps ? C'est pour un apéro ou une soirée ?"}
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
@@ -235,8 +244,8 @@ const App: React.FC = () => {
                         <button
                             onClick={handleSearch}
                             disabled={!description.trim() || loading}
-                            className={`group px-10 py-5 font-bold uppercase tracking-[0.2em] text-sm transition-all flex items-center gap-4
-                                ${!description.trim() || loading ? 'bg-pop-black/5 text-pop-black/20 cursor-not-allowed' : 'bg-pop-yellow text-pop-black pop-shadow hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none'}
+                            className={`group rounded-full px-12 py-5 font-black uppercase tracking-[0.2em] text-sm transition-all duration-300 flex items-center gap-4
+                                ${!description.trim() || loading ? 'bg-pop-white/5 text-pop-white/15 cursor-not-allowed' : 'bg-pop-yellow text-pop-black hover:scale-105 hover:shadow-[0_0_30px_rgba(253,247,9,0.3)]'}
                             `}
                         >
                             <span>Lancer le moteur</span>

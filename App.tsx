@@ -1,7 +1,13 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { analyzeGameNeeds } from './geminiService';
 import { AnalysisResult, ExperienceMode } from './types';
+
+const POP_LOGO = 'https://popforyou.fr/wp-content/uploads/2021/02/logo-pop-blanc.svg';
+
+const STICKER_URLS = Array.from({ length: 10 }, (_, i) =>
+  `https://popforyou.fr/wp-content/uploads/2025/04/sticker-${i + 1}.svg`
+);
 
 function useScrollReveal() {
   const ref = useRef<HTMLDivElement>(null);
@@ -22,6 +28,85 @@ function useScrollReveal() {
   }, []);
   return ref;
 }
+
+// Sticker trail component - stickers appear at mouse position
+const StickerTrail: React.FC = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const stickersRef = useRef<HTMLImageElement[]>([]);
+  const currentIndex = useRef(0);
+  const lastPos = useRef({ x: 0, y: 0 });
+  const mousePos = useRef({ x: 0, y: 0 });
+
+  const spawnSticker = useCallback(() => {
+    const img = stickersRef.current[currentIndex.current];
+    if (!img) return;
+
+    const scale = 0.3 + Math.random() * 0.8;
+    const rotation = -30 + Math.random() * 60;
+
+    img.style.left = `${mousePos.current.x - 100}px`;
+    img.style.top = `${mousePos.current.y - 100}px`;
+    img.style.transform = `scale(0) rotate(${rotation}deg)`;
+    img.style.opacity = '1';
+    img.style.zIndex = String(Date.now());
+    img.style.transition = 'none';
+
+    requestAnimationFrame(() => {
+      img.style.transition = 'transform 0.4s cubic-bezier(0.47, 1.64, 0.41, 0.8), opacity 0.8s ease';
+      img.style.transform = `scale(${scale}) rotate(${rotation}deg)`;
+
+      setTimeout(() => {
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 300 + Math.random() * 400;
+        const flyX = Math.cos(angle) * dist;
+        const flyY = Math.sin(angle) * dist;
+        const spinDeg = -720 + Math.random() * 1440;
+        img.style.transition = 'transform 0.6s ease-in, opacity 0.5s ease';
+        img.style.transform = `scale(${scale * 1.3}) rotate(${spinDeg}deg) translate(${flyX}px, ${flyY}px)`;
+        img.style.opacity = '0';
+      }, 1200);
+    });
+
+    currentIndex.current = (currentIndex.current + 1) % STICKER_URLS.length;
+  }, []);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleMove = (e: MouseEvent) => {
+      const rect = container.getBoundingClientRect();
+      mousePos.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+
+      const dx = mousePos.current.x - lastPos.current.x;
+      const dy = mousePos.current.y - lastPos.current.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist > 150) {
+        lastPos.current = { ...mousePos.current };
+        spawnSticker();
+      }
+    };
+
+    container.addEventListener('mousemove', handleMove);
+    return () => container.removeEventListener('mousemove', handleMove);
+  }, [spawnSticker]);
+
+  return (
+    <div ref={containerRef} className="absolute inset-0 overflow-hidden pointer-events-auto">
+      {STICKER_URLS.map((url, i) => (
+        <img
+          key={i}
+          ref={(el) => { if (el) stickersRef.current[i] = el; }}
+          src={url}
+          alt=""
+          className="absolute w-[200px] h-[200px] pointer-events-none"
+          style={{ opacity: 0, top: 0, left: 0, willChange: 'transform' }}
+        />
+      ))}
+    </div>
+  );
+};
 
 const App: React.FC = () => {
   const [mode, setMode] = useState<ExperienceMode>('cadeau');
@@ -64,9 +149,7 @@ const App: React.FC = () => {
       {/* Navbar */}
       <nav className="relative z-50 bg-pop-black border-b border-pop-yellow/20 px-6 py-5 flex items-center justify-between">
         <div className="flex items-center gap-4 cursor-pointer group" onClick={reset}>
-          <div className="relative">
-            <div className="w-11 h-11 bg-pop-yellow flex items-center justify-center text-pop-black font-black text-2xl pop-shadow-sm transition-transform group-hover:scale-110">P</div>
-          </div>
+          <img src={POP_LOGO} alt="Pop" className="h-10 transition-transform group-hover:scale-110" />
           <div className="flex flex-col">
             <span className="font-serif text-xl leading-none text-pop-yellow">POP GAME</span>
             <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-pop-muted">Le Moteur de Jeux</span>
@@ -75,7 +158,7 @@ const App: React.FC = () => {
 
         <div className="hidden lg:flex gap-8 text-[11px] font-bold uppercase tracking-wider">
           <a href="#" className="hover-underline-pop text-pop-white/70 hover:text-pop-yellow transition-colors">Nos Univers</a>
-          <a href="#" className="hover-underline-pop text-pop-white/70 hover:text-pop-yellow transition-colors">30 Ans de Jeu</a>
+          <a href="#" className="hover-underline-pop text-pop-white/70 hover:text-pop-yellow transition-colors">Pop Game</a>
           <a href="#" className="bg-pop-yellow text-pop-black px-5 py-2 font-black hover:bg-pop-pink hover:text-pop-white transition-all">Le Moteur</a>
         </div>
       </nav>
@@ -166,16 +249,16 @@ const App: React.FC = () => {
           </div>
         )}
 
-        {/* Loading */}
+        {/* Loading - Sticker Trail */}
         {loading && (
-          <div className="flex-grow flex flex-col items-center justify-center py-32 text-center px-6">
-            <div className="relative w-24 h-24 mb-12">
-               <div className="absolute inset-0 bg-pop-yellow animate-pulse-glow" />
-               <div className="absolute inset-0 flex items-center justify-center font-serif text-pop-black text-4xl">?</div>
+          <div className="flex-grow flex flex-col items-center justify-center py-32 text-center px-6 relative min-h-[80vh]">
+            <StickerTrail />
+            <div className="relative z-10 flex flex-col items-center">
+              <img src={POP_LOGO} alt="Pop" className="h-20 mb-10 animate-pulse" />
+              <h2 className="font-sans text-4xl md:text-6xl font-black uppercase text-pop-yellow mb-6">Analyse en cours</h2>
+              <div className="w-48 h-1 animate-shimmer rounded-full mb-6" />
+              <p className="text-pop-white/40 text-sm uppercase tracking-[0.3em]">Bougez la souris pour patienter</p>
             </div>
-            <h2 className="font-serif text-4xl md:text-5xl text-pop-yellow mb-4">Analyse en cours...</h2>
-            <div className="w-48 h-1 animate-shimmer rounded-full mt-4" />
-            <p className="text-pop-muted text-sm uppercase tracking-[0.3em] mt-6">Le moteur tourne</p>
           </div>
         )}
 
@@ -189,7 +272,7 @@ const App: React.FC = () => {
                </div>
                <div className="max-w-4xl mx-auto relative z-10 text-center">
                  <RevealBlock>
-                   <h2 className="font-sans text-4xl md:text-6xl lg:text-7xl font-black uppercase text-pop-white leading-[1.05] mb-12">
+                   <h2 className="font-sans text-3xl md:text-5xl lg:text-6xl font-black uppercase text-pop-white leading-[1.05] mb-12">
                      « {result.catchphrase} »
                    </h2>
                  </RevealBlock>
@@ -241,7 +324,7 @@ const App: React.FC = () => {
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-16 mb-16">
           <div className="col-span-1 md:col-span-1">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-pop-yellow flex items-center justify-center text-pop-black font-black text-xl">P</div>
+              <img src={POP_LOGO} alt="Pop" className="h-8" />
               <div className="flex flex-col leading-none">
                 <span className="font-serif text-lg text-pop-yellow">POP GAME</span>
                 <span className="text-[9px] font-semibold text-pop-muted uppercase tracking-[0.3em]">Le Moteur de Jeux</span>
@@ -282,8 +365,6 @@ const App: React.FC = () => {
     </div>
   );
 };
-
-const accentColors = ['pop-yellow', 'pop-violet', 'pop-pink'] as const;
 
 const RevealBlock: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => {
   const ref = useScrollReveal();

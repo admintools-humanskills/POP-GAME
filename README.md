@@ -58,7 +58,7 @@ La Cloud Function recoit les requetes du frontend et appelle l'API Gemini avec l
 ```
 ├── App.tsx                  # Composant principal
 ├── index.tsx                # Point d'entree React
-├── index.css                # Styles Tailwind + theme Asmodee
+├── index.css                # Styles Tailwind + theme Pop
 ├── index.html               # HTML template
 ├── geminiService.ts         # Service d'appel au proxy Gemini
 ├── types.ts                 # Types TypeScript

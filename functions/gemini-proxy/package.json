@@ -1,5 +1,5 @@
 {
-  "name": "asmodee-gemini-proxy",
+  "name": "pop-game-gemini-proxy",
   "version": "1.0.0",
   "main": "index.js",
   "dependencies": {

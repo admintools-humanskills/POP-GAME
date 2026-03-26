@@ -28,7 +28,7 @@ export async function analyzeGameNeeds(
 
     return (await response.json()) as AnalysisResult;
   } catch (error) {
-    console.error("Asmodee AI Engine Error:", error);
+    console.error("Pop Game Engine Error:", error);
     return null;
   }
 }

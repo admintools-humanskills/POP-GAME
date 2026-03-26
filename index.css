@@ -1,49 +1,138 @@
 @import "tailwindcss";
 
 @theme {
-  --color-asmodee-red: #e30613;
-  --color-asmodee-yellow: #ffc20e;
-  --color-asmodee-cyan: #00aeef;
-  --color-asmodee-black: #000000;
-  --color-asmodee-white: #ffffff;
-  --color-asmodee-gray: #f2f2f2;
-  
-  --font-sans: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  --color-pop-black: #000000;
+  --color-pop-yellow: #FDF709;
+  --color-pop-violet: #5544CC;
+  --color-pop-pink: #FF56AE;
+  --color-pop-white: #FFFFFF;
+  --color-pop-dark: #0a0a0a;
+  --color-pop-gray: #1a1a1a;
+  --color-pop-muted: #888888;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Kalnia", serif;
 }
 
-@utility asmo-shadow {
-  box-shadow: 8px 8px 0px #000000;
+@utility pop-shadow {
+  box-shadow: 6px 6px 0px #FDF709;
 }
 
-@utility asmo-shadow-sm {
-  box-shadow: 4px 4px 0px #000000;
+@utility pop-shadow-sm {
+  box-shadow: 4px 4px 0px #FDF709;
 }
 
-@utility asmo-border {
-  border: 3px solid #000000;
+@utility pop-shadow-violet {
+  box-shadow: 6px 6px 0px #5544CC;
 }
 
-@utility skew-title {
-  transform: skew(-5deg) rotate(-2deg);
+@utility pop-shadow-pink {
+  box-shadow: 6px 6px 0px #FF56AE;
+}
+
+@utility pop-shadow-white {
+  box-shadow: 6px 6px 0px #FFFFFF;
+}
+
+@utility pop-border {
+  border: 2px solid #FDF709;
+}
+
+@utility pop-border-white {
+  border: 2px solid #FFFFFF;
+}
+
+@utility pop-border-violet {
+  border: 2px solid #5544CC;
+}
+
+@utility pop-border-pink {
+  border: 2px solid #FF56AE;
 }
 
 body {
-  background-color: #ffffff;
-  color: #000000;
-  font-family: 'Montserrat', sans-serif;
+  background-color: #000000;
+  color: #FFFFFF;
+  font-family: 'Inter', sans-serif;
 }
 
-.wavy-divider {
-  mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg"><path d="M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,149.3C672,149,768,203,864,229.3C960,256,1056,256,1152,224C1248,192,1344,128,1392,96L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z" fill="black"/></svg>');
-  mask-repeat: no-repeat;
-  mask-size: cover;
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes bounce-slow {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+@keyframes popBounce {
+  0% { transform: scale(0.8) rotate(-10deg); opacity: 0; }
+  60% { transform: scale(1.05) rotate(2deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
 }
 
-.animate-bounce-slow {
-  animation: bounce-slow 3s infinite ease-in-out;
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(253, 247, 9, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(253, 247, 9, 0.6); }
 }
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-fade-up {
+  animation: fadeUp 0.6s cubic-bezier(0.47, 1.64, 0.41, 0.8) forwards;
+}
+
+.animate-pop-bounce {
+  animation: popBounce 0.6s cubic-bezier(0.47, 1.64, 0.41, 0.8) forwards;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.hover-underline-pop {
+  position: relative;
+}
+
+.hover-underline-pop::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #FDF709;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s ease;
+}
+
+.hover-underline-pop:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.clip-diagonal {
+  clip-path: polygon(0 5%, 100% 0, 100% 95%, 0 100%);
+}
+
+/* Scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(50px) rotate(2deg) scale(0.95);
+  transition: all 0.8s cubic-bezier(0.47, 1.64, 0.41, 0.8);
+}
+
+.reveal-active {
+  opacity: 1;
+  transform: translateY(0) rotate(0) scale(1);
+}
+
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }

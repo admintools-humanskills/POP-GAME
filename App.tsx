@@ -1,7 +1,27 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { analyzeGameNeeds } from './geminiService';
 import { AnalysisResult, ExperienceMode } from './types';
+
+function useScrollReveal() {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add('reveal-active');
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+  return ref;
+}
 
 const App: React.FC = () => {
   const [mode, setMode] = useState<ExperienceMode>('cadeau');
@@ -15,10 +35,10 @@ const App: React.FC = () => {
     setLoading(true);
     setResult(null);
     try {
-      const analysis = await analyzeGameNeeds({ 
-        mode, 
-        description, 
-        ageRange: ageInput || "Non spécifié (tous âges)" 
+      const analysis = await analyzeGameNeeds({
+        mode,
+        description,
+        ageRange: ageInput || "Non spécifié (tous âges)"
       });
       setResult(analysis);
       setTimeout(() => {
@@ -39,24 +59,24 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white font-sans text-asmodee-black flex flex-col relative">
-      
-      {/* Navbar Asmodee Style */}
-      <nav className="relative z-50 bg-asmodee-black text-white px-6 py-4 flex items-center justify-between shadow-xl">
+    <div className="min-h-screen bg-pop-black font-sans text-pop-white flex flex-col relative">
+
+      {/* Navbar */}
+      <nav className="relative z-50 bg-pop-black border-b border-pop-yellow/20 px-6 py-5 flex items-center justify-between">
         <div className="flex items-center gap-4 cursor-pointer group" onClick={reset}>
           <div className="relative">
-            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-asmodee-black font-black text-2xl asmo-shadow-sm transform group-hover:rotate-12 transition-transform">a</div>
+            <div className="w-11 h-11 bg-pop-yellow flex items-center justify-center text-pop-black font-black text-2xl pop-shadow-sm transition-transform group-hover:scale-110">P</div>
           </div>
           <div className="flex flex-col">
-            <span className="font-black text-xl leading-none tracking-tighter italic">ASMODEE</span>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-asmodee-cyan">Inspired by Players</span>
+            <span className="font-serif text-xl leading-none text-pop-yellow">POP GAME</span>
+            <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-pop-muted">Le Moteur de Jeux</span>
           </div>
         </div>
-        
-        <div className="hidden lg:flex gap-8 text-[11px] font-black uppercase italic tracking-wider">
-          <a href="#" className="hover:text-asmodee-yellow transition-colors">Nos Univers</a>
-          <a href="#" className="hover:text-asmodee-cyan transition-colors">30 Ans de Jeu</a>
-          <a href="#" className="bg-asmodee-red px-4 py-2 rounded-full hover:scale-105 transition-transform">Le Moteur de Jeu</a>
+
+        <div className="hidden lg:flex gap-8 text-[11px] font-bold uppercase tracking-wider">
+          <a href="#" className="hover-underline-pop text-pop-white/70 hover:text-pop-yellow transition-colors">Nos Univers</a>
+          <a href="#" className="hover-underline-pop text-pop-white/70 hover:text-pop-yellow transition-colors">30 Ans de Jeu</a>
+          <a href="#" className="bg-pop-yellow text-pop-black px-5 py-2 font-black hover:bg-pop-pink hover:text-pop-white transition-all">Le Moteur</a>
         </div>
       </nav>
 
@@ -64,84 +84,80 @@ const App: React.FC = () => {
         {!result && !loading && (
           <div className="flex flex-col">
             {/* Hero Section */}
-            <section className="bg-asmodee-yellow py-20 px-6 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-1/2 h-full bg-asmodee-cyan transform skew-x-12 translate-x-32 opacity-20" />
+            <section className="py-24 md:py-32 px-6 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-full">
+                <div className="absolute top-20 right-20 w-64 h-64 bg-pop-violet/10 blur-[100px]" />
+                <div className="absolute bottom-20 left-20 w-48 h-48 bg-pop-pink/10 blur-[80px]" />
+              </div>
               <div className="max-w-5xl mx-auto relative z-10 text-center flex flex-col items-center">
-                <div className="max-w-3xl">
-                    <h1 className="text-6xl md:text-8xl font-black text-asmodee-black uppercase italic leading-[0.9] skew-title mb-8">
-                        Trouvez <br/> <span className="text-asmodee-red">Le Jeu</span> <br/> Idéal
+                <div className="max-w-4xl">
+                    <h1 className="font-sans text-6xl md:text-8xl lg:text-9xl font-black uppercase text-pop-white leading-[0.95] mb-8">
+                        Trouvez<br/>
+                        Le Jeu<br/>
+                        <span className="text-pop-pink">Idéal</span>
                     </h1>
-                    <p className="text-xl md:text-2xl font-bold leading-snug">
-                        Dites-nous avec qui vous jouez, nous trouverons la pépite Asmodee qui fera vibrer votre table !
+                    <p className="text-lg md:text-xl text-pop-white/60 font-medium leading-relaxed max-w-2xl mx-auto">
+                        Dites-nous avec qui vous jouez, nous trouverons la pépite qui fera vibrer votre table.
                     </p>
                 </div>
               </div>
             </section>
 
             {/* Input Section */}
-            <section className="py-20 px-6 max-w-4xl mx-auto w-full -mt-10 relative z-20">
-              <div className="bg-white asmo-border asmo-shadow rounded-[2rem] overflow-hidden">
-                <div className="flex bg-asmodee-black text-white">
-                    <button 
+            <section className="pb-24 px-6 max-w-3xl mx-auto w-full relative z-20">
+              <div className="bg-pop-white overflow-hidden">
+                {/* Mode Tabs */}
+                <div className="flex">
+                    <button
                         onClick={() => setMode('cadeau')}
-                        className={`flex-1 py-6 text-sm font-black uppercase italic tracking-widest transition-all ${mode === 'cadeau' ? 'bg-asmodee-red text-white' : 'hover:bg-asmodee-gray hover:text-asmodee-black'}`}
+                        className={`flex-1 py-5 text-xs font-bold uppercase tracking-[0.2em] transition-all ${mode === 'cadeau' ? 'bg-pop-yellow text-pop-black' : 'bg-pop-black text-pop-white/50 hover:text-pop-yellow'}`}
                     >
                         Mode Cadeau
                     </button>
-                    <button 
+                    <button
                         onClick={() => setMode('occasion')}
-                        className={`flex-1 py-6 text-sm font-black uppercase italic tracking-widest transition-all ${mode === 'occasion' ? 'bg-asmodee-cyan text-white' : 'hover:bg-asmodee-gray hover:text-asmodee-black'}`}
+                        className={`flex-1 py-5 text-xs font-bold uppercase tracking-[0.2em] transition-all ${mode === 'occasion' ? 'bg-pop-violet text-pop-white' : 'bg-pop-black text-pop-white/50 hover:text-pop-violet'}`}
                     >
                         Mode Occasion
                     </button>
                 </div>
 
-                <div className="p-8 md:p-12">
-                    <div className="grid grid-cols-1 gap-12 mb-8">
-                        {/* New Age Text Input */}
-                        <div className="bg-asmodee-gray/30 p-8 rounded-3xl border-2 border-dashed border-asmodee-black/10">
-                          <label className="block text-xs font-black uppercase italic tracking-widest mb-4 text-asmodee-red">Pour quel âge ?</label>
-                          <div className="relative">
-                            <input 
-                              type="text"
-                              value={ageInput}
-                              onChange={(e) => setAgeInput(e.target.value)}
-                              placeholder="Ex: 28 ans, enfants de 5 et 6 ans, entre 30 et 35 ans..."
-                              className="w-full bg-white asmo-border rounded-2xl p-6 text-asmodee-black font-bold italic text-lg placeholder-asmodee-black/20 focus:outline-none focus:ring-4 focus:ring-asmodee-red/20 transition-all asmo-shadow-sm"
-                            />
-                            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black uppercase italic text-asmodee-black/30 pointer-events-none hidden md:block">
-                              Libre
-                            </div>
-                          </div>
-                          <p className="mt-3 text-[10px] font-black uppercase italic text-asmodee-black/40 px-2">
-                            Soyez précis : le moteur adaptera la complexité des jeux suggérés.
-                          </p>
+                <div className="p-8 md:p-10">
+                    <div className="flex flex-col gap-8 mb-8">
+                        {/* Age Input */}
+                        <div>
+                          <label className="block text-[10px] font-bold uppercase tracking-[0.3em] mb-3 text-pop-pink">Pour quel âge ?</label>
+                          <input
+                            type="text"
+                            value={ageInput}
+                            onChange={(e) => setAgeInput(e.target.value)}
+                            placeholder="Ex: 28 ans, enfants de 5 et 6 ans..."
+                            className="w-full bg-pop-white border border-pop-black/15 p-5 text-pop-black font-medium placeholder-pop-black/30 focus:outline-none focus:border-pop-pink transition-colors"
+                          />
                         </div>
 
-                        <div className="relative">
-                            <label className="block text-xs font-black uppercase italic tracking-widest mb-3 text-asmodee-cyan">Dites-nous en plus sur l'envie</label>
+                        {/* Description */}
+                        <div>
+                            <label className="block text-[10px] font-bold uppercase tracking-[0.3em] mb-3 text-pop-violet">Dites-nous en plus sur l'envie</label>
                             <textarea
-                                className="w-full bg-asmodee-gray/50 asmo-border rounded-2xl p-6 text-asmodee-black placeholder-asmodee-black/30 focus:outline-none focus:ring-4 focus:ring-asmodee-yellow/50 transition-all h-40 text-lg font-bold leading-tight resize-none shadow-inner"
-                                placeholder={mode === 'cadeau' ? "Décrivez le profil : Fan de stratégie ? Créatif ? Adore bluffer ? C'est un cadeau pour qui ?" : "On est combien ? On a combien de temps ? C'est pour un apéro ou une soirée sérieuse ?"}
+                                className="w-full bg-pop-white border border-pop-black/15 p-5 text-pop-black placeholder-pop-black/30 focus:outline-none focus:border-pop-violet transition-colors h-36 resize-none"
+                                placeholder={mode === 'cadeau' ? "Décrivez le profil : Fan de stratégie ? Créatif ? C'est un cadeau pour qui ?" : "On est combien ? On a combien de temps ? C'est pour un apéro ou une soirée ?"}
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
                             />
-                            <div className="absolute -bottom-4 -right-4 w-10 h-10 bg-asmodee-yellow asmo-border asmo-shadow-sm rounded-full flex items-center justify-center font-black">!</div>
                         </div>
                     </div>
-                    
-                    <div className="mt-8 flex justify-center">
+
+                    <div className="flex justify-center">
                         <button
                             onClick={handleSearch}
                             disabled={!description.trim() || loading}
-                            className={`group px-12 py-6 rounded-full font-black uppercase italic tracking-widest text-lg transition-all shadow-xl flex items-center gap-4 asmo-shadow-sm
-                                ${!description.trim() || loading ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-asmodee-black text-white hover:bg-asmodee-red hover:-translate-y-1'}
+                            className={`group px-10 py-5 font-bold uppercase tracking-[0.2em] text-sm transition-all flex items-center gap-4
+                                ${!description.trim() || loading ? 'bg-pop-black/5 text-pop-black/20 cursor-not-allowed' : 'bg-pop-yellow text-pop-black pop-shadow hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none'}
                             `}
                         >
                             <span>Lancer le moteur</span>
-                            <div className="w-8 h-8 bg-asmodee-yellow rounded-full flex items-center justify-center group-hover:rotate-12 transition-transform">
-                                <svg className="w-5 h-5 text-asmodee-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                            </div>
+                            <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                         </button>
                     </div>
                 </div>
@@ -150,163 +166,219 @@ const App: React.FC = () => {
           </div>
         )}
 
+        {/* Loading */}
         {loading && (
-          <div className="flex-grow flex flex-col items-center justify-center py-32 text-center px-6 bg-asmodee-cyan/10">
-            <div className="relative w-32 h-32 mb-12">
-               <div className="absolute inset-0 bg-asmodee-yellow asmo-border asmo-shadow rotate-12 animate-pulse"></div>
-               <div className="absolute inset-0 bg-asmodee-red asmo-border asmo-shadow -rotate-12 animate-bounce"></div>
-               <div className="absolute inset-0 flex items-center justify-center font-black text-white text-5xl italic drop-shadow-lg">!</div>
+          <div className="flex-grow flex flex-col items-center justify-center py-32 text-center px-6">
+            <div className="relative w-24 h-24 mb-12">
+               <div className="absolute inset-0 bg-pop-yellow animate-pulse-glow" />
+               <div className="absolute inset-0 flex items-center justify-center font-serif text-pop-black text-4xl">?</div>
             </div>
-            <h2 className="text-5xl font-black text-asmodee-black uppercase italic skew-title mb-4">Analyse des Quêtes...</h2>
-            <p className="text-asmodee-red font-black uppercase tracking-[0.2em] text-sm italic">Inspired by Players • Chargement de l'Asmodee World</p>
+            <h2 className="font-serif text-4xl md:text-5xl text-pop-yellow mb-4">Analyse en cours...</h2>
+            <div className="w-48 h-1 animate-shimmer rounded-full mt-4" />
+            <p className="text-pop-muted text-sm uppercase tracking-[0.3em] mt-6">Le moteur tourne</p>
           </div>
         )}
 
+        {/* Results */}
         {result && (
-          <div id="results" className="animate-fade-in">
+          <div id="results" className="animate-fade-up">
             {/* Header Result */}
-            <header className="bg-asmodee-black text-white py-24 px-6 relative overflow-hidden">
-               <div className="absolute top-0 left-0 w-full h-full bg-asmodee-cyan opacity-10 transform skew-y-3 translate-y-20" />
-               <div className="max-w-5xl mx-auto relative z-10 text-center">
-                 <span className="bg-asmodee-yellow text-asmodee-black px-6 py-2 text-sm font-black uppercase italic mb-8 inline-block asmo-shadow-sm">Le Diagnostic du Game Master</span>
-                 <h2 className="text-5xl md:text-7xl font-black uppercase italic leading-none mb-12 skew-title">
-                   « {result.catchphrase} »
-                 </h2>
-                 <div className="max-w-3xl mx-auto bg-white/10 backdrop-blur-md rounded-3xl p-8 border-2 border-white/20">
-                    <p className="text-xl md:text-2xl font-bold leading-relaxed italic text-asmodee-cyan">
-                        {result.gameMasterAnalysis}
-                    </p>
-                 </div>
+            <header className="py-24 px-6 relative overflow-hidden border-b border-pop-yellow/20">
+               <div className="absolute top-0 left-0 w-full h-full">
+                 <div className="absolute top-10 right-10 w-96 h-96 bg-pop-violet/5 blur-[120px]" />
+               </div>
+               <div className="max-w-4xl mx-auto relative z-10 text-center">
+                 <RevealBlock>
+                   <h2 className="font-sans text-4xl md:text-6xl lg:text-7xl font-black uppercase text-pop-white leading-[1.05] mb-12">
+                     « {result.catchphrase} »
+                   </h2>
+                 </RevealBlock>
+                 <RevealBlock className="reveal-delay-2">
+                   <div className="max-w-2xl mx-auto bg-pop-violet p-10 md:p-12">
+                      <p className="text-lg md:text-xl text-pop-white/90 leading-relaxed font-light">
+                          {result.gameMasterAnalysis}
+                      </p>
+                   </div>
+                 </RevealBlock>
                </div>
             </header>
 
-            <section className="py-24 px-6 bg-asmodee-gray">
-                <div className="max-w-7xl mx-auto">
-                    <div className="flex items-center gap-4 mb-16 overflow-hidden">
-                        <h3 className="text-4xl font-black uppercase italic whitespace-nowrap">La Sélection <span className="text-asmodee-red">Asmodee</span></h3>
-                        <div className="h-2 flex-grow bg-asmodee-black/10 rounded-full"></div>
-                    </div>
+            {/* Games Grid */}
+            <section className="py-24 px-6">
+                <div className="max-w-6xl mx-auto">
+                    <RevealBlock>
+                      <div className="flex items-center gap-6 mb-16">
+                          <h3 className="font-sans text-3xl md:text-4xl font-black uppercase text-pop-yellow whitespace-nowrap">La Sélection</h3>
+                          <div className="h-[2px] flex-grow bg-pop-yellow/20"></div>
+                      </div>
+                    </RevealBlock>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {result.games.map((game, idx) => (
-                        <GameCard key={idx} game={game} />
+                        <GameCard key={idx} game={game} index={idx} />
                     ))}
                     </div>
+
                 </div>
             </section>
 
-            <div className="py-20 text-center bg-white border-t-8 border-asmodee-black">
-              <button 
+            {/* Reset Button */}
+            <div className="py-20 text-center border-t border-pop-white/10">
+              <button
                 onClick={reset}
-                className="group inline-flex items-center gap-4 bg-asmodee-yellow asmo-border asmo-shadow px-12 py-6 rounded-full text-lg font-black uppercase italic hover:bg-asmodee-cyan hover:text-white transition-all"
+                className="group inline-flex items-center gap-4 bg-pop-black border border-pop-yellow text-pop-yellow px-10 py-5 font-bold uppercase tracking-[0.2em] text-sm hover:bg-pop-yellow hover:text-pop-black transition-all"
               >
-                <svg className="w-6 h-6 transition-transform group-hover:-translate-x-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                Nouvelle Quête
+                <svg className="w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Nouvelle Recherche
               </button>
             </div>
           </div>
         )}
       </main>
 
-      <footer className="bg-asmodee-black text-white pt-24 pb-12 px-8 border-t-8 border-asmodee-red">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-16 mb-20">
+      {/* Footer */}
+      <footer className="bg-pop-black border-t border-pop-yellow/20 pt-20 pb-10 px-8">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-16 mb-16">
           <div className="col-span-1 md:col-span-1">
-            <div className="flex items-center gap-4 mb-8">
-              <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-asmodee-black font-black text-3xl shadow-lg">a</div>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 bg-pop-yellow flex items-center justify-center text-pop-black font-black text-xl">P</div>
               <div className="flex flex-col leading-none">
-                <span className="font-black text-2xl italic tracking-tighter">ASMODEE</span>
-                <span className="text-[10px] font-bold text-asmodee-yellow uppercase tracking-widest">Great Games, Amazing Stories</span>
+                <span className="font-serif text-lg text-pop-yellow">POP GAME</span>
+                <span className="text-[9px] font-semibold text-pop-muted uppercase tracking-[0.3em]">Le Moteur de Jeux</span>
               </div>
             </div>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest leading-loose">
-              Inspiré par les joueurs.<br/>
-              Depuis 1995, nous créons des moments inoubliables.
+            <p className="text-xs text-pop-muted leading-relaxed">
+              Trouvez le jeu de société parfait grâce à l'intelligence artificielle.
             </p>
           </div>
           <div>
-            <h4 className="font-black text-sm uppercase italic mb-8 text-asmodee-cyan">Univers Ludiques</h4>
-            <ul className="text-xs space-y-4 uppercase font-bold tracking-widest text-gray-400">
-              <li><a href="#" className="hover:text-white transition-colors">Nos Studios</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Jeux Experts</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Jeux Famille</a></li>
+            <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] mb-6 text-pop-violet">Univers</h4>
+            <ul className="text-xs space-y-3 text-pop-muted">
+              <li><a href="#" className="hover:text-pop-yellow transition-colors">Nos Studios</a></li>
+              <li><a href="#" className="hover:text-pop-yellow transition-colors">Jeux Experts</a></li>
+              <li><a href="#" className="hover:text-pop-yellow transition-colors">Jeux Famille</a></li>
             </ul>
           </div>
           <div>
-            <h4 className="font-black text-sm uppercase italic mb-8 text-asmodee-yellow">L'Entreprise</h4>
-            <ul className="text-xs space-y-4 uppercase font-bold tracking-widest text-gray-400">
-              <li><a href="#" className="hover:text-white transition-colors">Notre Vision</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Engagements</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Presse</a></li>
+            <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] mb-6 text-pop-pink">L'Entreprise</h4>
+            <ul className="text-xs space-y-3 text-pop-muted">
+              <li><a href="#" className="hover:text-pop-yellow transition-colors">Notre Vision</a></li>
+              <li><a href="#" className="hover:text-pop-yellow transition-colors">Engagements</a></li>
+              <li><a href="#" className="hover:text-pop-yellow transition-colors">Presse</a></li>
             </ul>
           </div>
           <div>
-            <h4 className="font-black text-sm uppercase italic mb-8 text-asmodee-red">Newsletter</h4>
-            <div className="flex bg-white/10 p-2 rounded-xl border border-white/20">
-              <input type="text" placeholder="VOTRE EMAIL" className="bg-transparent text-xs px-4 py-2 w-full focus:outline-none placeholder:text-gray-500 font-black" />
-              <button className="bg-asmodee-red text-white text-[10px] font-black px-6 py-2 rounded-lg hover:bg-asmodee-cyan transition-colors">OK</button>
+            <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] mb-6 text-pop-yellow">Newsletter</h4>
+            <div className="flex border border-pop-white/20">
+              <input type="text" placeholder="VOTRE EMAIL" className="bg-transparent text-xs px-4 py-3 w-full focus:outline-none placeholder:text-pop-muted font-medium" />
+              <button className="bg-pop-yellow text-pop-black text-[10px] font-bold px-5 hover:bg-pop-pink hover:text-pop-white transition-colors whitespace-nowrap">OK</button>
             </div>
           </div>
         </div>
-        <div className="max-w-7xl mx-auto text-center pt-12 border-t border-white/10">
-          <p className="text-[10px] text-gray-500 font-black uppercase tracking-[0.5em]">© 2024 ASMODEE GROUP • INSPIRED BY PLAYERS • 30 ANS</p>
+        <div className="max-w-6xl mx-auto text-center pt-10 border-t border-pop-white/10">
+          <p className="text-[10px] text-pop-muted uppercase tracking-[0.4em]">© 2025 POP GAME • Le Moteur de Jeux</p>
         </div>
       </footer>
     </div>
   );
 };
 
-const GameCard: React.FC<{ game: any }> = ({ game }) => (
-  <div className="group flex flex-col bg-white asmo-border asmo-shadow rounded-[2rem] overflow-hidden transition-all duration-500 hover:-translate-y-4 hover:asmodee-yellow">
-    <div className="w-full bg-asmodee-gray/50 p-8 flex items-center justify-center relative aspect-square">
-       <div className="absolute top-6 left-6 z-10 skew-title">
-          <span className="bg-asmodee-red text-white text-[10px] font-black px-4 py-2 rounded-full uppercase tracking-widest asmo-shadow-sm">WANTED</span>
-       </div>
-       <div className="w-full h-full bg-white asmo-border rounded-3xl flex items-center justify-center asmo-shadow-sm group-hover:rotate-2 transition-transform duration-500 p-8">
-         <img 
-          src={`https://picsum.photos/seed/${encodeURIComponent(game.name)}/600/600`} 
-          alt={game.name} 
-          className="w-full h-auto object-contain drop-shadow-2xl grayscale group-hover:grayscale-0 transition-all duration-700"
-        />
-       </div>
-    </div>
-    
-    <div className="p-8 flex flex-col flex-grow">
-      <div className="mb-6">
-        <span className="text-[10px] uppercase tracking-[0.2em] text-asmodee-cyan font-black block mb-3 italic">
-          {game.superPower}
-        </span>
-        <h3 className="text-3xl font-black text-asmodee-black uppercase italic leading-none group-hover:text-asmodee-red transition-colors min-h-[4rem]">
-          {game.name}
-        </h3>
-      </div>
-      
-      <p className="text-asmodee-black text-[14px] font-bold leading-tight italic mb-8 flex-grow">
-        « {game.rationale} »
-      </p>
+const accentColors = ['pop-yellow', 'pop-violet', 'pop-pink'] as const;
 
-      <div className="flex flex-wrap gap-2 mb-8 bg-asmodee-gray/50 p-4 rounded-xl border border-asmodee-black/10">
-        <div className="flex-1 text-center">
-          <span className="block text-[8px] text-gray-500 font-black uppercase mb-1">Joueurs</span>
-          <span className="text-[11px] font-black text-asmodee-black italic">{game.stats.players}</span>
-        </div>
-        <div className="flex-1 text-center border-x-2 border-asmodee-black/10">
-          <span className="block text-[8px] text-gray-500 font-black uppercase mb-1">Temps</span>
-          <span className="text-[11px] font-black text-asmodee-black italic">{game.stats.duration}</span>
-        </div>
-        <div className="flex-1 text-center">
-          <span className="block text-[8px] text-gray-500 font-black uppercase mb-1">Âge</span>
-          <span className="text-[11px] font-black text-asmodee-black italic">{game.stats.age}</span>
-        </div>
+const RevealBlock: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => {
+  const ref = useScrollReveal();
+  return <div ref={ref} className={`reveal ${className}`}>{children}</div>;
+};
+
+const ACCENT_COLORS = ['#FDF709', '#5544CC', '#FF56AE'] as const;
+const ACCENT_TEXT = ['text-pop-yellow', 'text-pop-violet', 'text-pop-pink'] as const;
+const ACCENT_BADGE = [
+  'bg-pop-yellow text-pop-black',
+  'bg-pop-violet text-pop-white',
+  'bg-pop-pink text-pop-white',
+] as const;
+
+const GameCard: React.FC<{ game: any; index: number }> = ({ game, index }) => {
+  const ci = index % 3;
+  const color = ACCENT_COLORS[ci];
+  const [hovered, setHovered] = useState(false);
+  const revealRef = useScrollReveal();
+
+  return (
+    <div
+      ref={revealRef}
+      className={`reveal reveal-delay-${index + 1} group flex flex-col bg-pop-black transition-all duration-300 hover:-translate-y-2`}
+      style={{
+        border: `2px solid ${hovered ? color : '#FFFFFF'}`,
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {/* Image */}
+      <div className="w-full bg-pop-black p-6 flex items-center justify-center relative aspect-square overflow-hidden">
+         <div className="absolute top-4 left-4 z-10">
+            <span className={`${ACCENT_BADGE[ci]} text-[9px] font-bold px-4 py-1.5 uppercase tracking-[0.2em]`}>Recommandé</span>
+         </div>
+         <div className="w-full h-full border border-pop-white/20 flex items-center justify-center bg-pop-black transition-colors p-6">
+           <img
+            src={`https://picsum.photos/seed/${encodeURIComponent(game.name)}/600/600`}
+            alt={game.name}
+            className="w-full h-auto object-contain grayscale group-hover:grayscale-0 transition-all duration-500"
+          />
+         </div>
       </div>
 
-      <div className="mt-auto flex items-center justify-between gap-4">
-        <span className="text-2xl font-black italic text-asmodee-red">{game.price}</span>
-        <button className="bg-asmodee-black text-white px-8 py-4 rounded-xl uppercase italic text-[10px] font-black hover:bg-asmodee-cyan transition-all transform asmo-shadow-sm active:translate-x-1 active:translate-y-1 active:shadow-none">
-          C'est mon jeu !
-        </button>
+      {/* Content */}
+      <div className="p-6 flex flex-col flex-grow" style={{ borderTop: `2px solid ${hovered ? color : '#FFFFFF'}` }}>
+        <div className="mb-4">
+          <span className={`text-[9px] uppercase tracking-[0.3em] ${ACCENT_TEXT[ci]} font-bold block mb-2`}>
+            {game.superPower}
+          </span>
+          <h3
+            className="font-sans text-2xl font-black uppercase leading-tight transition-colors min-h-[3.5rem]"
+            style={{ color: hovered ? color : '#FFFFFF' }}
+          >
+            {game.name}
+          </h3>
+        </div>
+
+        <p className="text-pop-white text-sm leading-relaxed mb-6 flex-grow font-light">
+          « {game.rationale} »
+        </p>
+
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          <div className="text-center py-4 px-2 rounded-lg" style={{ backgroundColor: `${color}15`, border: `1px solid ${color}40` }}>
+            <span className="block text-[9px] uppercase tracking-wider mb-2 font-bold" style={{ color }}>Joueurs</span>
+            <span className="text-base font-black text-pop-white">{game.stats.players}</span>
+          </div>
+          <div className="text-center py-4 px-2 rounded-lg" style={{ backgroundColor: `${color}15`, border: `1px solid ${color}40` }}>
+            <span className="block text-[9px] uppercase tracking-wider mb-2 font-bold" style={{ color }}>Temps</span>
+            <span className="text-base font-black text-pop-white">{game.stats.duration}</span>
+          </div>
+          <div className="text-center py-4 px-2 rounded-lg" style={{ backgroundColor: `${color}15`, border: `1px solid ${color}40` }}>
+            <span className="block text-[9px] uppercase tracking-wider mb-2 font-bold" style={{ color }}>Âge</span>
+            <span className="text-base font-black text-pop-white">{game.stats.age}</span>
+          </div>
+        </div>
+
+        {/* Price + CTA */}
+        <div className="mt-auto flex items-center justify-between gap-4">
+          <span className={`text-2xl font-black ${ACCENT_TEXT[ci]}`}>{game.price}</span>
+          <button
+            className="rounded-full px-8 py-3.5 uppercase text-[10px] font-black tracking-[0.15em] transition-all duration-300 hover:scale-105 hover:shadow-lg"
+            style={{
+              backgroundColor: color,
+              color: ci === 0 ? '#000000' : '#FFFFFF',
+              boxShadow: `4px 4px 0px ${ci === 0 ? '#000000' : color}80`,
+            }}
+          >
+            C'est mon jeu !
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default App;
